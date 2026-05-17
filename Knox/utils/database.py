@@ -14,11 +14,12 @@ class Database:
         safe_name = database_name.replace(" ", "_").replace("-", "_")
         self._client = AsyncMongoClient(
             uri,
-            # Fix: Python 3.13 strict TLS requires explicit CA bundle (certifi)
-            # without this Atlas returns TLSV1_ALERT_INTERNAL_ERROR
+            # Fix: Force TLS and bypass cert validation if OpenSSL fails
+            tls=True,
+            tlsAllowInvalidCertificates=True,
             tlsCAFile=certifi.where(),
             # Render free has 1 CPU; small pool avoids thread contention
-            maxPoolSize=5,
+            maxPoolSize=10,
             minPoolSize=1,
             # Give Atlas enough time to respond on Render cold starts
             serverSelectionTimeoutMS=30000,

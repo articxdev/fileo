@@ -2,7 +2,7 @@ aiohttp
 cloudscraper
 Jinja2
 pyrofork
-pymongo
+pymongo[srv]
 certifi
 psutil
 python-dotenv
