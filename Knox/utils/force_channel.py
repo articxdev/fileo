@@ -4,7 +4,9 @@ import asyncio
 
 from pyrogram import Client
 from pyrogram.errors import FloodWait, UserNotParticipant
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from pyrogram.types import InlineKeyboardMarkup, Message
+
+from Knox.utils.keyboard import join_channel_markup
 
 from Knox.utils.logger import logger
 from Knox.utils.messages import MSG_COMMUNITY_CHANNEL
@@ -56,22 +58,19 @@ async def force_channel_check(client: Client, message: Message):
                 await asyncio.sleep(e.value)
     except UserNotParticipant:
         link, title = await get_force_info(client)
-        if link and title:
-            try:
-                await message.reply_text(
-                    MSG_COMMUNITY_CHANNEL.format(channel_title=title),
-                    reply_markup=InlineKeyboardMarkup([[
-                        InlineKeyboardButton("Join", url=link)
-                    ]])
-                )
-            except FloodWait as e:
-                await asyncio.sleep(e.value)
-                await message.reply_text(
-                    MSG_COMMUNITY_CHANNEL.format(channel_title=title),
-                    reply_markup=InlineKeyboardMarkup([[
-                        InlineKeyboardButton("Join", url=link)
-                    ]])
-                )
+        join_row = join_channel_markup(title or "Channel", link)
+        kb = InlineKeyboardMarkup([join_row]) if join_row else None
+        try:
+            await message.reply_text(
+                MSG_COMMUNITY_CHANNEL.format(channel_title=title or "Channel"),
+                reply_markup=kb,
+            )
+        except FloodWait as e:
+            await asyncio.sleep(e.value)
+            await message.reply_text(
+                MSG_COMMUNITY_CHANNEL.format(channel_title=title or "Channel"),
+                reply_markup=kb,
+            )
         else:
             try:
                 await message.reply_text("You must join the channel to use Knox.")

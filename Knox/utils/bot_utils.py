@@ -4,6 +4,8 @@ import asyncio
 from typing import Any, Dict, Optional
 from urllib.parse import quote
 
+from Knox.utils.keyboard import is_valid_button_url
+
 from pyrogram import Client
 from pyrogram.enums import ChatMemberStatus
 from pyrogram.errors import FloodWait
@@ -91,18 +93,27 @@ async def gen_links(fwd_msg: Message, shortener: bool = True) -> Dict[str, str]:
     
     if shortener and getattr(Var, "SHORTEN_MEDIA_LINKS", False):
         try:
-            s_results = await asyncio.gather(shorten(slink), shorten(olink), return_exceptions=True)
-            if not isinstance(s_results[0], Exception):
+            s_results = await asyncio.wait_for(
+                asyncio.gather(shorten(slink), shorten(olink), return_exceptions=True),
+                timeout=8,
+            )
+            if not isinstance(s_results[0], Exception) and is_valid_button_url(s_results[0]):
                 slink = s_results[0]
+            elif not isinstance(s_results[0], Exception):
+                logger.warning(f"Shortener returned invalid stream URL, using direct link.")
             else:
                 logger.warning(f"Failed to shorten stream_link: {s_results[0]}")
-            if not isinstance(s_results[1], Exception):
+            if not isinstance(s_results[1], Exception) and is_valid_button_url(s_results[1]):
                 olink = s_results[1]
+            elif not isinstance(s_results[1], Exception):
+                logger.warning(f"Shortener returned invalid download URL, using direct link.")
             else:
                 logger.warning(f"Failed to shorten online_link: {s_results[1]}")
+        except asyncio.TimeoutError:
+            logger.warning("Link shortener timed out; using direct links.")
         except Exception as e:
             logger.error(f"Error during link shortening: {e}")
-    
+
     return {"stream_link": slink, "online_link": olink, "media_name": m_name, "media_size": m_size_hr}
 
 

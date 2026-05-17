@@ -6,20 +6,19 @@ from typing import Any, Dict, Optional
 
 from pyrogram import Client, enums, filters
 from pyrogram.errors import FloodWait, MessageNotModified, MessageDeleteForbidden, MessageIdInvalid
-from pyrogram.types import (InlineKeyboardButton, InlineKeyboardMarkup,
-                            Message)
+from pyrogram.types import Message
 
 from Knox.bot import StreamBot
 from Knox.utils.bot_utils import (gen_links, is_admin, log_newusr, notify_own,
                                      reply_user_err)
+from Knox.utils.keyboard import link_markup, start_chat_markup
 from Knox.utils.database import db
 from Knox.utils.decorators import (check_banned, get_shortener_status,
                                       require_token)
 from Knox.utils.force_channel import force_channel_check
 from Knox.utils.logger import logger
 from Knox.utils.messages import (
-    MSG_BATCH_LINKS_READY, MSG_BUTTON_DOWNLOAD, MSG_BUTTON_START_CHAT,
-    MSG_BUTTON_STREAM_NOW, MSG_CRITICAL_ERROR, MSG_DM_BATCH_PREFIX,
+    MSG_BATCH_LINKS_READY, MSG_CRITICAL_ERROR, MSG_DM_BATCH_PREFIX,
     MSG_DM_SINGLE_PREFIX, MSG_ERROR_DM_FAILED, MSG_ERROR_INVALID_NUMBER,
     MSG_ERROR_NO_FILE, MSG_ERROR_NOT_ADMIN, MSG_ERROR_NUMBER_RANGE,
     MSG_ERROR_PROCESSING_MEDIA, MSG_ERROR_REPLY_FILE, MSG_ERROR_START_BOT,
@@ -33,33 +32,32 @@ from Knox.vars import Var
 BATCH_SIZE = 10
 LINK_CHUNK_SIZE = 20
 BATCH_UPDATE_INTERVAL = 5
-MESSAGE_DELAY = 0.5
+MESSAGE_DELAY = 0.05
 
 
 async def fwd_media(m_msg: Message) -> Optional[Message]:
     try:
         try:
-            return await m_msg.copy(chat_id=Var.BIN_CHANNEL)
+            return await m_msg.forward(chat_id=Var.BIN_CHANNEL)
         except FloodWait as e:
             await asyncio.sleep(e.value)
-            return await m_msg.copy(chat_id=Var.BIN_CHANNEL)
+            return await m_msg.forward(chat_id=Var.BIN_CHANNEL)
     except Exception as e:
         if "MEDIA_CAPTION_TOO_LONG" in str(e):
-            logger.debug(f"MEDIA_CAPTION_TOO_LONG error, retrying without caption: {e}")
+            logger.debug(f"MEDIA_CAPTION_TOO_LONG on forward, retrying with copy: {e}")
+        try:
             try:
                 return await m_msg.copy(chat_id=Var.BIN_CHANNEL, caption=None)
             except FloodWait as e:
                 await asyncio.sleep(e.value)
                 return await m_msg.copy(chat_id=Var.BIN_CHANNEL, caption=None)
-        logger.error(f"Error fwd_media copy: {e}", exc_info=True)
-        return None
+        except Exception as copy_err:
+            logger.error(f"Error fwd_media: {copy_err}", exc_info=True)
+            return None
 
 
 def get_link_buttons(links):
-    return InlineKeyboardMarkup([[
-        InlineKeyboardButton(MSG_BUTTON_STREAM_NOW, url=links['stream_link']),
-        InlineKeyboardButton(MSG_BUTTON_DOWNLOAD, url=links['online_link'])
-    ]])
+    return link_markup(links["stream_link"], links["online_link"])
 
 async def validate_request_common(client: Client, message: Message) -> Optional[bool]:
     if not await check_banned(client, message):
@@ -134,13 +132,14 @@ async def send_dm_links(bot: Client, user_id: int, links: Dict[str, Any], chat_t
                       download_link=links['online_link'],
                       stream_link=links['stream_link']
                   )
+        markup = get_link_buttons(links)
         try:
             await bot.send_message(
                 chat_id=user_id,
                 text=dm_text,
                 disable_web_page_preview=True,
                 parse_mode=enums.ParseMode.MARKDOWN,
-                reply_markup=get_link_buttons(links)
+                reply_markup=markup,
             )
         except FloodWait as e:
             await asyncio.sleep(e.value)
@@ -149,40 +148,31 @@ async def send_dm_links(bot: Client, user_id: int, links: Dict[str, Any], chat_t
                 text=dm_text,
                 disable_web_page_preview=True,
                 parse_mode=enums.ParseMode.MARKDOWN,
-                reply_markup=get_link_buttons(links)
+                reply_markup=markup,
             )
     except Exception as e:
         logger.error(f"Error sending DM to user {user_id}: {e}", exc_info=True)
 
 
 async def send_link(msg: Message, links: Dict[str, Any]):
+    markup = get_link_buttons(links)
+    payload = dict(
+        text=MSG_LINKS.format(
+            file_name=links["media_name"],
+            file_size=links["media_size"],
+            download_link=links["online_link"],
+            stream_link=links["stream_link"],
+        ),
+        quote=True,
+        parse_mode=enums.ParseMode.MARKDOWN,
+        disable_web_page_preview=True,
+        reply_markup=markup,
+    )
     try:
-        await msg.reply_text(
-            MSG_LINKS.format(
-                file_name=links['media_name'],
-                file_size=links['media_size'],
-                download_link=links['online_link'],
-                stream_link=links['stream_link']
-            ),
-            quote=True,
-            parse_mode=enums.ParseMode.MARKDOWN,
-            disable_web_page_preview=True,
-            reply_markup=get_link_buttons(links)
-        )
+        await msg.reply_text(**payload)
     except FloodWait as e:
         await asyncio.sleep(e.value)
-        await msg.reply_text(
-            MSG_LINKS.format(
-                file_name=links['media_name'],
-                file_size=links['media_size'],
-                download_link=links['online_link'],
-                stream_link=links['stream_link']
-            ),
-            quote=True,
-            parse_mode=enums.ParseMode.MARKDOWN,
-            disable_web_page_preview=True,
-            reply_markup=get_link_buttons(links)
-        )
+        await msg.reply_text(**payload)
 
 
 @StreamBot.on_message(filters.command("link") & ~filters.private)
@@ -192,23 +182,25 @@ async def link_handler(bot: Client, msg: Message, **kwargs):
         if shortener_val is None:
             return
         if message.from_user and not await db.is_user_exist(message.from_user.id):
-            invite_link = f"https://t.me/{client.me.username}?start=start"
+            username = client.me.username if client.me else None
+            invite_link = f"https://t.me/{username}?start=start" if username else None
+            start_markup = start_chat_markup(username)
             try:
                 await message.reply_text(
-                    MSG_ERROR_START_BOT.format(invite_link=invite_link),
+                    MSG_ERROR_START_BOT.format(invite_link=invite_link or "Knox"),
                     disable_web_page_preview=True,
                     parse_mode=enums.ParseMode.MARKDOWN,
-                    reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(MSG_BUTTON_START_CHAT, url=invite_link)]]),
-                    quote=True
+                    reply_markup=start_markup,
+                    quote=True,
                 )
             except FloodWait as e:
                 await asyncio.sleep(e.value)
                 await message.reply_text(
-                    MSG_ERROR_START_BOT.format(invite_link=invite_link),
+                    MSG_ERROR_START_BOT.format(invite_link=invite_link or "Knox"),
                     disable_web_page_preview=True,
                     parse_mode=enums.ParseMode.MARKDOWN,
-                    reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(MSG_BUTTON_START_CHAT, url=invite_link)]]),
-                    quote=True
+                    reply_markup=start_markup,
+                    quote=True,
                 )
             return
 
@@ -352,17 +344,23 @@ async def channel_receive_handler(bot: Client, msg: Message):
             else:
                 await send_channel_links(stored_msg, links, source_info, message.chat.id)
 
-            try:
+            markup = get_link_buttons(links)
+            if markup:
                 try:
-                    await message.edit_reply_markup(reply_markup=get_link_buttons(links))
-                except FloodWait as e:
-                    await asyncio.sleep(e.value)
-                    await message.edit_reply_markup(reply_markup=get_link_buttons(links))
-            except (MessageNotModified, MessageDeleteForbidden, MessageIdInvalid):
-                logger.debug(f"Failed to edit reply markup for message {message.id} due to not modified, permissions or invalid ID. Sending new link instead.")
-                await send_link(message, links)
-            except Exception as e:
-                logger.error(f"Error editing reply markup for message {message.id}: {e}", exc_info=True)
+                    try:
+                        await message.edit_reply_markup(reply_markup=markup)
+                    except FloodWait as e:
+                        await asyncio.sleep(e.value)
+                        await message.edit_reply_markup(reply_markup=markup)
+                except (MessageNotModified, MessageDeleteForbidden, MessageIdInvalid):
+                    logger.debug(
+                        f"Failed to edit reply markup for message {message.id}; sending link message."
+                    )
+                    await send_link(message, links)
+                except Exception as e:
+                    logger.error(f"Error editing reply markup for message {message.id}: {e}", exc_info=True)
+                    await send_link(message, links)
+            else:
                 await send_link(message, links)
         except Exception as e:
             logger.error(f"Error in _actual_channel_receive_handler for message {message.id}: {e}", exc_info=True)
@@ -400,14 +398,14 @@ async def process_single(
             await safe_edit_message(
                 notification_msg,
                 MSG_LINKS.format(
-                    file_name=links['media_name'],
-                    file_size=links['media_size'],
-                    download_link=links['online_link'],
-                    stream_link=links['stream_link']
+                    file_name=links["media_name"],
+                    file_size=links["media_size"],
+                    download_link=links["online_link"],
+                    stream_link=links["stream_link"],
                 ),
                 parse_mode=enums.ParseMode.MARKDOWN,
                 disable_web_page_preview=True,
-                reply_markup=get_link_buttons(links)
+                reply_markup=get_link_buttons(links),
             )
         elif not original_request_msg:
             await send_link(msg, links)

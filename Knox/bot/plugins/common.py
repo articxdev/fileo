@@ -16,11 +16,11 @@ from Knox.utils.database import db
 from Knox.utils.decorators import check_banned
 from Knox.utils.file_properties import get_fname, get_fsize, parse_fid
 from Knox.utils.force_channel import force_channel_check, get_force_info
+from Knox.utils.keyboard import about_markup, help_markup, main_menu_markup, sanitize_button_url
 from Knox.utils.human_readable import humanbytes
 from Knox.utils.logger import logger
 from Knox.utils.messages import (
-    MSG_ABOUT, MSG_BUTTON_ABOUT, MSG_BUTTON_CLOSE, MSG_BUTTON_GET_HELP,
-    MSG_BUTTON_GITHUB, MSG_BUTTON_JOIN_CHANNEL, MSG_BUTTON_VIEW_PROFILE,
+    MSG_ABOUT, MSG_BUTTON_CLOSE, MSG_BUTTON_VIEW_PROFILE,
     MSG_COMMUNITY_CHANNEL, MSG_DC_ANON_ERROR, MSG_DC_FILE_ERROR,
     MSG_DC_FILE_INFO, MSG_DC_INVALID_USAGE, MSG_DC_UNKNOWN,
     MSG_ERROR_USER_INFO, MSG_FILE_TYPE_ANIMATION, MSG_FILE_TYPE_AUDIO,
@@ -99,69 +99,46 @@ async def start_command(bot: Client, msg: Message):
     if link:
         txt += f"\n\n{MSG_COMMUNITY_CHANNEL.format(channel_title=title)}"
     
-    btns = [
-        [InlineKeyboardButton(MSG_BUTTON_GET_HELP, callback_data="help_command"),
-         InlineKeyboardButton(MSG_BUTTON_ABOUT, callback_data="about_command")],
-        [InlineKeyboardButton(MSG_BUTTON_GITHUB, url="https://github.com/fyaz05/FileToLink/"),
-         InlineKeyboardButton(MSG_BUTTON_CLOSE, callback_data="close_panel")]
-    ]
-    
-    if link:
-        btns.append([InlineKeyboardButton(MSG_BUTTON_JOIN_CHANNEL.format(channel_title=title), url=link)])
-    
+    markup = main_menu_markup(join_link=link, join_title=title or "Channel")
+
     try:
-        await msg.reply_text(text=txt, reply_markup=InlineKeyboardMarkup(btns))
+        await msg.reply_text(text=txt, reply_markup=markup)
     except FloodWait as e:
         await asyncio.sleep(e.value)
-        await msg.reply_text(text=txt, reply_markup=InlineKeyboardMarkup(btns))
+        await msg.reply_text(text=txt, reply_markup=markup)
 
 @StreamBot.on_message(filters.command("help") & filters.private)
 async def help_command(bot: Client, msg: Message):
     if not await check_banned(bot, msg):
         return
-    if msg.from_user:
-        await log_newusr(bot, msg.from_user.id, msg.from_user.first_name)
-    
+
     txt = MSG_HELP.format(max_files=Var.MAX_BATCH_FILES)
-    btns = [[InlineKeyboardButton(MSG_BUTTON_ABOUT, callback_data="about_command")]]
-    
     link, title = await get_force_info(bot)
-    if link:
-        btns.append([InlineKeyboardButton(MSG_BUTTON_JOIN_CHANNEL.format(channel_title=title), url=link)])
-    
-    btns.append([InlineKeyboardButton(MSG_BUTTON_CLOSE, callback_data="close_panel")])
+    markup = help_markup(join_link=link, join_title=title or "Channel")
     try:
-        await msg.reply_text(text=txt, reply_markup=InlineKeyboardMarkup(btns))
+        await msg.reply_text(text=txt, reply_markup=markup)
     except FloodWait as e:
         await asyncio.sleep(e.value)
-        await msg.reply_text(text=txt, reply_markup=InlineKeyboardMarkup(btns))
+        await msg.reply_text(text=txt, reply_markup=markup)
 
 @StreamBot.on_message(filters.command("about") & filters.private)
 async def about_command(bot: Client, msg: Message):
     if not await check_banned(bot, msg):
         return
-    if msg.from_user:
-        await log_newusr(bot, msg.from_user.id, msg.from_user.first_name)
-    
-    btns = [
-        [InlineKeyboardButton(MSG_BUTTON_GET_HELP, callback_data="help_command")],
-        [InlineKeyboardButton(MSG_BUTTON_GITHUB, url="https://github.com/fyaz05/FileToLink/"),
-         InlineKeyboardButton(MSG_BUTTON_CLOSE, callback_data="close_panel")]
-    ]
-    
     try:
-        await msg.reply_text(text=MSG_ABOUT, reply_markup=InlineKeyboardMarkup(btns))
+        await msg.reply_text(text=MSG_ABOUT, reply_markup=about_markup())
     except FloodWait as e:
         await asyncio.sleep(e.value)
-        await msg.reply_text(text=MSG_ABOUT, reply_markup=InlineKeyboardMarkup(btns))
+        await msg.reply_text(text=MSG_ABOUT, reply_markup=about_markup())
 
 async def send_user_dc(msg: Message, user: User):
     txt = await gen_dc_txt(user)
-    url = f"https://t.me/{user.username}" if user.username else f"tg://user?id={user.id}"
-    btns = [
-        [InlineKeyboardButton(MSG_BUTTON_VIEW_PROFILE, url=url)],
-        [InlineKeyboardButton(MSG_BUTTON_CLOSE, callback_data="close_panel")]
-    ]
+    url = sanitize_button_url(
+        f"https://t.me/{user.username}" if user.username else f"tg://user?id={user.id}"
+    )
+    btns = [[InlineKeyboardButton(MSG_BUTTON_CLOSE, callback_data="close_panel")]]
+    if url:
+        btns.insert(0, [InlineKeyboardButton(MSG_BUTTON_VIEW_PROFILE, url=url)])
     try:
         await msg.reply_text(text=txt, reply_markup=InlineKeyboardMarkup(btns))
     except FloodWait as e:
@@ -258,22 +235,19 @@ async def ping_command(bot: Client, msg: Message):
     end = time.time()
     ms = (end - start) * 1000
     
-    btns = [
-        [InlineKeyboardButton(MSG_BUTTON_GET_HELP, callback_data="help_command"),
-         InlineKeyboardButton(MSG_BUTTON_CLOSE, callback_data="close_panel")]
-    ]
-    
+    btns = help_markup()
+
     try:
         await sent.edit_text(
             MSG_PING_RESPONSE.format(time_taken_ms=ms),
-            reply_markup=InlineKeyboardMarkup(btns),
+            reply_markup=btns,
             disable_web_page_preview=True
         )
     except FloodWait as e:
         await asyncio.sleep(e.value)
         await sent.edit_text(
             MSG_PING_RESPONSE.format(time_taken_ms=ms),
-            reply_markup=InlineKeyboardMarkup(btns),
+            reply_markup=btns,
             disable_web_page_preview=True
         )
     except MessageNotModified:

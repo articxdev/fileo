@@ -2,12 +2,13 @@
 
 import asyncio
 from pyrogram.errors import FloodWait
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from pyrogram.types import Message
 
 from Knox.utils.database import db
 from Knox.utils.logger import logger
 from Knox.utils.messages import (MSG_DECORATOR_BANNED,
                                     MSG_ERROR_UNAUTHORIZED, MSG_TOKEN_INVALID)
+from Knox.utils.keyboard import is_valid_button_url, token_markup
 from Knox.utils.shortener import shorten
 from Knox.utils.tokens import allowed, check, generate
 from Knox.vars import Var
@@ -99,32 +100,45 @@ async def require_token(client, message: Message):
                 await asyncio.sleep(e.value)
                 await message.reply_text("Sorry, an unexpected error occurred. Please try again later.", quote=True)
             return False
+        if not me.username:
+            try:
+                await message.reply_text(
+                    "Knox bot username is not set. Contact the administrator.",
+                    quote=True,
+                )
+            except FloodWait as e:
+                await asyncio.sleep(e.value)
+                await message.reply_text(
+                    "Knox bot username is not set. Contact the administrator.",
+                    quote=True,
+                )
+            return False
+
         deep_link = f"https://t.me/{me.username}?start={temp_token_string}"
         short_url = deep_link
 
         try:
-            short_url_result = await shorten(deep_link)
-            if short_url_result:
+            short_url_result = await asyncio.wait_for(shorten(deep_link), timeout=8)
+            if short_url_result and is_valid_button_url(short_url_result):
                 short_url = short_url_result
+        except asyncio.TimeoutError:
+            logger.warning(f"Token link shortener timed out for user {user_id}; using full link.")
         except Exception as e:
             logger.warning(f"Failed to shorten token link for user {user_id}: {e}. Using full link.", exc_info=True)
 
+        token_kb = token_markup(short_url)
         try:
             await message.reply_text(
                 MSG_TOKEN_INVALID,
-                reply_markup=InlineKeyboardMarkup([
-                    [InlineKeyboardButton("Activate Access", url=short_url)]
-                ]),
-                quote=True
+                reply_markup=token_kb,
+                quote=True,
             )
         except FloodWait as e:
             await asyncio.sleep(e.value)
             await message.reply_text(
                 MSG_TOKEN_INVALID,
-                reply_markup=InlineKeyboardMarkup([
-                    [InlineKeyboardButton("Activate Access", url=short_url)]
-                ]),
-                quote=True
+                reply_markup=token_kb,
+                quote=True,
             )
         logger.debug(f"Sent temporary token activation link to user {user_id}.")
         return False

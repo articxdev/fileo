@@ -23,6 +23,19 @@ def str_to_int_set(val: str) -> Set[int]:
     return result
 
 
+def _resolve_fqdn() -> str:
+    raw = os.getenv("FQDN", "").strip()
+    if raw:
+        return raw.replace("https://", "").replace("http://", "").strip("/")
+    for key in ("RENDER_EXTERNAL_URL", "RAILWAY_PUBLIC_DOMAIN"):
+        val = os.getenv(key, "").strip()
+        if val:
+            return val.replace("https://", "").replace("http://", "").strip("/")
+    heroku = os.getenv("HEROKU_APP_NAME", "").strip()
+    if heroku:
+        return f"{heroku}.herokuapp.com"
+    return os.getenv("BIND_ADDRESS", "0.0.0.0").strip()
+
 
 class Var:
     API_ID: int = int(os.getenv("API_ID", "0"))
@@ -53,11 +66,17 @@ class Var:
     if not OWNER_ID:
         logger.warning("WARNING: OWNER_ID is not set. No user will be granted owner access.")
 
-    FQDN: str = os.getenv("FQDN", "") or BIND_ADDRESS
+    FQDN: str = _resolve_fqdn()
     HAS_SSL: bool = str_to_bool(os.getenv("HAS_SSL", "True"))
     PROTOCOL: str = "https" if HAS_SSL else "http"
     PORT_SEGMENT: str = "" if NO_PORT else f":{PORT}"
     URL: str = f"{PROTOCOL}://{FQDN}{PORT_SEGMENT}/"
+
+    if FQDN in ("0.0.0.0", "127.0.0.1", "localhost"):
+        logger.warning(
+            "FQDN is not set to a public host. Set FQDN (or RENDER_EXTERNAL_URL on Render) "
+            "so stream/download buttons work in Telegram."
+        )
 
     SET_COMMANDS: bool = str_to_bool(os.getenv("SET_COMMANDS", "True"))
 
