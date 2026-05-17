@@ -32,7 +32,7 @@ from Knox.vars import Var
 BATCH_SIZE = 10
 LINK_CHUNK_SIZE = 20
 BATCH_UPDATE_INTERVAL = 5
-MESSAGE_DELAY = 0.05
+MESSAGE_DELAY = 0
 
 
 async def fwd_media(m_msg: Message) -> Optional[Message]:
@@ -187,7 +187,7 @@ async def link_handler(bot: Client, msg: Message, **kwargs):
             start_markup = start_chat_markup(username)
             try:
                 await message.reply_text(
-                    MSG_ERROR_START_BOT.format(invite_link=invite_link or "Knox"),
+                    MSG_ERROR_START_BOT.format(invite_link=invite_link or "the bot"),
                     disable_web_page_preview=True,
                     parse_mode=enums.ParseMode.MARKDOWN,
                     reply_markup=start_markup,
@@ -196,7 +196,7 @@ async def link_handler(bot: Client, msg: Message, **kwargs):
             except FloodWait as e:
                 await asyncio.sleep(e.value)
                 await message.reply_text(
-                    MSG_ERROR_START_BOT.format(invite_link=invite_link or "Knox"),
+                    MSG_ERROR_START_BOT.format(invite_link=invite_link or "the bot"),
                     disable_web_page_preview=True,
                     parse_mode=enums.ParseMode.MARKDOWN,
                     reply_markup=start_markup,
@@ -262,13 +262,10 @@ async def private_receive_handler(bot: Client, msg: Message, **kwargs):
 
         notification_msg = handler_kwargs.get('notification_msg')
 
-        await log_newusr(client, message.from_user.id, message.from_user.first_name or "")
-        try:
-            status_msg = await message.reply_text(MSG_PROCESSING_FILE, quote=True)
-        except FloodWait as e:
-            await asyncio.sleep(e.value)
-            status_msg = await message.reply_text(MSG_PROCESSING_FILE, quote=True)
-        await process_single(client, message, message, status_msg, shortener_val, notification_msg=notification_msg)
+        asyncio.create_task(
+            log_newusr(client, message.from_user.id, message.from_user.first_name or "")
+        )
+        await process_single(client, message, message, None, shortener_val, notification_msg=notification_msg)
 
     await handle_rate_limited_request(bot, msg, _actual_private_receive_handler, **kwargs)
 
@@ -301,7 +298,7 @@ async def channel_receive_handler(bot: Client, msg: Message):
             return
         if not await is_admin(client, message.chat.id):
             logger.debug(
-                f"Knox is not admin in channel {message.chat.id} "
+                f"Bot is not admin in channel {message.chat.id} "
                 f"({message.chat.title or 'Unknown'}). Ignoring message.")
             return
 
@@ -409,45 +406,53 @@ async def process_single(
             )
         elif not original_request_msg:
             await send_link(msg, links)
-        if msg.chat.type != enums.ChatType.PRIVATE and msg.from_user and not original_request_msg:
-            await send_dm_links(bot, msg.from_user.id, links, msg.chat.title or "the chat")
-        source_msg = original_request_msg if original_request_msg else msg
-        source_info = ""
-        source_id = 0
-        if source_msg.from_user:
-            source_info = source_msg.from_user.full_name
-            if not source_info:
-                source_info = f"@{source_msg.from_user.username}" if source_msg.from_user.username else "Unknown User"
-            source_id = source_msg.from_user.id
-        elif source_msg.chat.type == enums.ChatType.CHANNEL:
-            source_info = source_msg.chat.title or "Unknown Channel"
-            source_id = source_msg.chat.id
-        if source_info and source_id:
-            try:
-                await stored_msg.reply_text(
-                    MSG_NEW_FILE_REQUEST.format(
-                        source_info=source_info,
-                        id_=source_id,
-                        online_link=links['online_link'],
-                        stream_link=links['stream_link']
-                    ),
-                    disable_web_page_preview=True,
-                    quote=True
-                )
-            except FloodWait as e:
-                await asyncio.sleep(e.value)
-                await stored_msg.reply_text(
-                    MSG_NEW_FILE_REQUEST.format(
-                        source_info=source_info,
-                        id_=source_id,
-                        online_link=links['online_link'],
-                        stream_link=links['stream_link']
-                    ),
-                    disable_web_page_preview=True,
-                    quote=True
-                )
         if status_msg:
             await safe_delete_message(status_msg)
+
+        async def _after_links():
+            if msg.chat.type != enums.ChatType.PRIVATE and msg.from_user and not original_request_msg:
+                await send_dm_links(bot, msg.from_user.id, links, msg.chat.title or "the chat")
+            source_msg = original_request_msg if original_request_msg else msg
+            source_info = ""
+            source_id = 0
+            if source_msg.from_user:
+                source_info = source_msg.from_user.full_name
+                if not source_info:
+                    source_info = (
+                        f"@{source_msg.from_user.username}"
+                        if source_msg.from_user.username
+                        else "Unknown User"
+                    )
+                source_id = source_msg.from_user.id
+            elif source_msg.chat.type == enums.ChatType.CHANNEL:
+                source_info = source_msg.chat.title or "Unknown Channel"
+                source_id = source_msg.chat.id
+            if source_info and source_id:
+                try:
+                    await stored_msg.reply_text(
+                        MSG_NEW_FILE_REQUEST.format(
+                            source_info=source_info,
+                            id_=source_id,
+                            online_link=links["online_link"],
+                            stream_link=links["stream_link"],
+                        ),
+                        disable_web_page_preview=True,
+                        quote=True,
+                    )
+                except FloodWait as e:
+                    await asyncio.sleep(e.value)
+                    await stored_msg.reply_text(
+                        MSG_NEW_FILE_REQUEST.format(
+                            source_info=source_info,
+                            id_=source_id,
+                            online_link=links["online_link"],
+                            stream_link=links["stream_link"],
+                        ),
+                        disable_web_page_preview=True,
+                        quote=True,
+                    )
+
+        asyncio.create_task(_after_links())
         return links
     except Exception as e:
         logger.error(f"Error processing single file for message {file_msg.id}: {e}", exc_info=True)

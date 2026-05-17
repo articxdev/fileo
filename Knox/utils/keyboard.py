@@ -105,5 +105,5 @@ def token_markup(url: str) -> Optional[InlineKeyboardMarkup]:
     if not safe:
         return None
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton("🔑 Activate Knox", url=safe)]
+        [InlineKeyboardButton("🔑 Activate Access", url=safe)]
     ])

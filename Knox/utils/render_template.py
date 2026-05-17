@@ -44,7 +44,7 @@ async def render_page(id: int, secure_hash: str, requested_action: str | None = 
         if requested_action == 'stream':
             template = template_env.get_template('req.html')
             context = {
-                'heading': f"Knox — {safe_filename}",
+                'heading': f"File To Link — {safe_filename}",
                 'file_name': safe_filename,
                 'src': f"{src}?disposition=inline"
             }

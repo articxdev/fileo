@@ -103,13 +103,13 @@ async def require_token(client, message: Message):
         if not me.username:
             try:
                 await message.reply_text(
-                    "Knox bot username is not set. Contact the administrator.",
+                    "Bot username is not set. Contact the administrator.",
                     quote=True,
                 )
             except FloodWait as e:
                 await asyncio.sleep(e.value)
                 await message.reply_text(
-                    "Knox bot username is not set. Contact the administrator.",
+                    "Bot username is not set. Contact the administrator.",
                     quote=True,
                 )
             return False

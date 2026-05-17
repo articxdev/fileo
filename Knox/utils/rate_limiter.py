@@ -337,6 +337,10 @@ async def request_executor():
 
 
 async def handle_rate_limited_request(bot: Client, message: Message, handler: Callable, *args, **kwargs):
+    if not rate_limiter.enabled:
+        await handler(bot, message, *args, **kwargs)
+        return
+
     rl_user_id = kwargs.pop('rl_user_id', None)
     user_id = rl_user_id if rl_user_id is not None else (message.from_user.id if message and message.from_user else None)
     if not isinstance(user_id, int):

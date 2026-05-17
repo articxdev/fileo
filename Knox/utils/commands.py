@@ -1,38 +1,55 @@
-﻿from pyrogram.types import BotCommand
+﻿from pyrogram.types import BotCommand, BotCommandScopeChat, BotCommandScopeDefault
 
 from Knox.bot import StreamBot
 from Knox.utils.logger import logger
 from Knox.vars import Var
 
-def get_commands():
-    command_descriptions = {
-        "start": "Start Knox and get a welcome message",
-        "link": "(Group) Generate a direct link for a file or batch",
-        "dc": "Retrieve the data center (DC) information of a user or file",
-        "ping": "Check Knox status and response time",
-        "about": "Get information about Knox",
-        "help": "Show help and usage instructions",
-        "status": "(Admin) View Knox details and current workload",
-        "stats": "(Admin) View usage statistics and resource consumption",
-        "broadcast": "(Admin) Send a message to all users",
-        "ban": "(Admin) Ban a user",
-        "unban": "(Admin) Unban a user",
-        "log": "(Admin) Send Knox logs",
-        "restart": "(Admin) Update and restart Knox",
-        "shell": "(Admin) Execute a shell command",
-        "speedtest": "(Admin) Run network speed test",
-        "users": "(Admin) Show the total number of users",
-        "authorize": "(Admin) Grant permanent access to a user",
-        "deauthorize": "(Admin) Remove permanent access from a user",
-        "listauth": "(Admin) List all authorized users"
-    }
-    return [BotCommand(name, desc) for name, desc in command_descriptions.items()]
+USER_COMMANDS = {
+    "start": "Start the bot",
+    "help": "How to use File To Link",
+    "about": "About this bot",
+    "ping": "Check if the bot is online",
+    "dc": "Data center info for user or file",
+    "link": "(Groups) Get stream & download link for a file",
+}
+
+ADMIN_COMMANDS = {
+    "status": "Server status and workload",
+    "stats": "System statistics",
+    "users": "Total registered users",
+    "broadcast": "Message all users",
+    "ban": "Ban a user",
+    "unban": "Unban a user",
+    "authorize": "Grant permanent access",
+    "deauthorize": "Revoke permanent access",
+    "listauth": "List authorized users",
+    "log": "Download bot logs",
+    "restart": "Update and restart",
+    "shell": "Run shell command",
+    "speedtest": "Network speed test",
+}
+
+
+def _to_commands(mapping: dict) -> list:
+    return [BotCommand(name, desc) for name, desc in mapping.items()]
+
 
 async def set_commands():
-    if Var.SET_COMMANDS:
-        try:
-            commands = get_commands()
-            if commands:
-                await StreamBot.set_bot_commands(commands)
-        except Exception as e:
-            logger.error(f"Failed to set bot commands: {e}", exc_info=True)
+    if not Var.SET_COMMANDS:
+        return
+    try:
+        user_cmds = _to_commands(USER_COMMANDS)
+        if user_cmds:
+            await StreamBot.set_bot_commands(user_cmds, scope=BotCommandScopeDefault())
+            logger.info("User commands registered (admin commands hidden from menu).")
+
+        if Var.OWNER_ID:
+            admin_cmds = _to_commands(ADMIN_COMMANDS)
+            if admin_cmds:
+                await StreamBot.set_bot_commands(
+                    admin_cmds,
+                    scope=BotCommandScopeChat(chat_id=Var.OWNER_ID),
+                )
+                logger.info("Admin commands registered for owner only.")
+    except Exception as e:
+        logger.error(f"Failed to set bot commands: {e}", exc_info=True)

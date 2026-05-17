@@ -35,15 +35,7 @@ VERSION = __version__
 def print_banner():
     banner = f"""
 ╔═══════════════════════════════════════════════════════════════════╗
-║                                                                   ║
-║    ██╗  ██╗███╗   ██╗ ██████╗ ██╗  ██╗                            ║
-║    ██║ ██╔╝████╗  ██║██╔═══██╗╚██╗██╔╝                            ║
-║    █████╔╝ ██╔██╗ ██║██║   ██║ ╚███╔╝                             ║
-║    ██╔═██╗ ██║╚██╗██║██║   ██║ ██╔██╗                             ║
-║    ██║  ██╗██║ ╚████║╚██████╔╝██╔╝ ██╗                            ║
-║    ╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝                            ║
-║                                                                   ║
-║                         Knox v{VERSION}                            ║
+║              File To Link  ·  v{VERSION:<10}                      ║
 ╚═══════════════════════════════════════════════════════════════════╝
 """
     print(banner)
@@ -96,9 +88,9 @@ async def import_plugins():
 async def start_services():
     start_time = datetime.now()
     print_banner()
-    print("╔════════════════ INITIALIZING KNOX SERVICES ═════════════════╗")
+    print("╔════════════════ INITIALIZING SERVICES ══════════════════════╗")
 
-    print("   ▶ Starting Knox (Telegram) initialization...")
+    print("   ▶ Starting bot...")
     try:
         try:
             await StreamBot.start()
@@ -115,10 +107,10 @@ async def start_services():
             bot_info = await StreamBot.get_me()
         
         StreamBot.username = bot_info.username
-        print(f"   ✓ Knox initialized successfully as @{StreamBot.username}")
+        print(f"   ✓ Bot ready: @{StreamBot.username}")
 
         await set_commands()
-        print("   ✓ Knox commands set successfully.")
+        print("   ✓ Commands registered.")
 
         restart_message_data = await db.get_restart_message()
         if restart_message_data:
@@ -151,7 +143,7 @@ async def start_services():
 
     except Exception as e:
         logger.error(
-            f"   ✖ Failed to initialize Knox: {e}", exc_info=True
+            f"   ✖ Failed to initialize bot: {e}", exc_info=True
         )
         return
 
@@ -216,12 +208,12 @@ async def start_services():
 
     elapsed_time = (datetime.now() - start_time).total_seconds()
     print("╠═══════════════════════════════════════════════════════════╣")
-    print(f"   ▶ Knox Name: {bot_info.first_name}")
+    print(f"   ▶ Name: {bot_info.first_name}")
     print(f"   ▶ Username: @{bot_info.username}")
     print(f"   ▶ Server: {bind_address}:{Var.PORT}")
     print(f"   ▶ Startup Time: {elapsed_time:.2f} seconds")
     print("╚═══════════════════════════════════════════════════════════╝")
-    print("   ▶ Knox is now running! Press CTRL+C to stop.")
+    print("   ▶ Running. Press CTRL+C to stop.")
 
     background_tasks = [
         request_executor_task,
@@ -276,7 +268,7 @@ if __name__ == '__main__':
         loop.run_until_complete(start_services())
     except KeyboardInterrupt:
         print("╔═══════════════════════════════════════════════════════════╗")
-        print("║                   Knox stopped by user (CTRL+C)           ║")
+        print("║                   Stopped by user (CTRL+C)                ║")
         print("╚═══════════════════════════════════════════════════════════╝")
     except Exception as e:
         logger.error(f"An unexpected error occurred: {e}")

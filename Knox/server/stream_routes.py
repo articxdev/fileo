@@ -14,6 +14,7 @@ from Knox.utils.custom_dl import ByteStreamer
 from Knox.utils.logger import logger
 from Knox.utils.render_template import render_page
 from Knox.utils.time_format import get_readable_time
+from Knox.vars import Var
 
 routes = web.RouteTableDef()
 
@@ -142,7 +143,7 @@ async def status_endpoint(request):
     return web.json_response(
         {
             "server": {
-                "name": "Knox",
+                "name": Var.NAME,
                 "status": "operational",
                 "version": __version__,
                 "uptime": get_readable_time(uptime)

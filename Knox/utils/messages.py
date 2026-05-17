@@ -10,12 +10,12 @@ MSG_ERROR_USER_INFO = "❗ **User Not Found:** Couldn't find user. Please check 
 
 # ------ User Input & Validation Errors ------
 MSG_INVALID_USER_ID = "❌ **Invalid User ID:** Please provide a numeric user ID."
-MSG_ERROR_START_BOT = "⚠️ You need to start Knox in private first to use this command.\n👉 [Click here]({invite_link}) to start a private chat."
+MSG_ERROR_START_BOT = "⚠️ Start the bot in private first.\n👉 [Open chat]({invite_link})"
 MSG_ERROR_REPLY_FILE = "⚠️ Please use the /link command in reply to a file."
 MSG_ERROR_NO_FILE = "⚠️ The message you're replying to does not contain any file."
 MSG_ERROR_INVALID_NUMBER = "⚠️ **Invalid number specified.**"
 MSG_ERROR_NUMBER_RANGE = "⚠️ **Please specify a number between 1 and {max_files}.**"
-MSG_ERROR_DM_FAILED = "⚠️ I couldn't send you a Direct Message. Please start Knox first."
+MSG_ERROR_DM_FAILED = "⚠️ I couldn't DM you. Please start the bot in private chat first."
 
 # ------ File & Media Errors ------
 MSG_ERROR_PROCESSING_MEDIA = "⚠️ **Oops!** Something went wrong while processing your media. Please try again. If the issue persists, contact support."
@@ -56,16 +56,16 @@ MSG_CRITICAL_ERROR = (
 # =====================================================================================
 
 # ------ Ban/Unban ------
-MSG_DECORATOR_BANNED = "You are currently banned and cannot use Knox.\nReason: {reason}\nBanned on: {ban_time}"
+MSG_DECORATOR_BANNED = "You are banned from using this bot.\nReason: {reason}\nBanned on: {ban_time}"
 MSG_BAN_USAGE = "⚠️ **Usage:** /ban [user_id] [reason]"
 MSG_CANNOT_BAN_OWNER = "❌ **Cannot ban an owner.**"
 MSG_ADMIN_USER_BANNED = "✅ **User {user_id} has been banned."
 MSG_BAN_REASON_SUFFIX = "\n📝 **Reason:** {reason}"
 MSG_ADMIN_NO_BAN_REASON = "No reason provided"
-MSG_USER_BANNED_NOTIFICATION = "🚫 **You have been banned from using Knox.**"
+MSG_USER_BANNED_NOTIFICATION = "🚫 **You have been banned from this bot.**"
 MSG_UNBAN_USAGE = "⚠️ **Usage:** /unban <user_id>"
 MSG_ADMIN_USER_UNBANNED = "✅ **User {user_id} has been unbanned."
-MSG_USER_UNBANNED_NOTIFICATION = "🎉 **You have been unbanned from using Knox.**"
+MSG_USER_UNBANNED_NOTIFICATION = "🎉 **You have been unbanned.**"
 MSG_USER_NOT_IN_BAN_LIST = "ℹ️ **User {user_id} was not found in the ban list."
 MSG_CHANNEL_BANNED = "✅ **Channel {channel_id} has been banned.**"
 MSG_CHANNEL_BANNED_REASON_SUFFIX = "\n📝 **Reason:** {reason}"
@@ -111,7 +111,7 @@ MSG_SHELL_NO_OUTPUT = "✅ <b>Command Executed:</b> No output."
 
 MSG_WORKLOAD_ITEM = "   {bot_name}: {load}\n"
 MSG_ADMIN_RESTART_DONE = "✅ **Restart Successful!**"
-MSG_RESTARTING = "♻️ **Updating and Restarting Knox...**\n\n> ⏳ Please wait a moment."
+MSG_RESTARTING = "♻️ **Updating and restarting...**\n\n> ⏳ Please wait."
 MSG_LOG_FILE_CAPTION = "📄 **System Logs**"
 
 MSG_LOG_FILE_EMPTY = "ℹ️ **Log File Empty:** No data found in the log file."
@@ -128,7 +128,7 @@ MSG_BUTTON_CANCEL_BROADCAST = "🛑 Cancel"
 MSG_BUTTON_VIEW_PROFILE = "👤 Profile"
 MSG_BUTTON_ABOUT = "ℹ️ About"
 MSG_BUTTON_JOIN_CHANNEL = "📢 Join {channel_title}"
-MSG_BUTTON_START_CHAT = "💬 Open Knox"
+MSG_BUTTON_START_CHAT = "💬 Start Bot"
 MSG_BUTTON_CLOSE = "✖️ Close"
 
 
@@ -138,54 +138,49 @@ MSG_BUTTON_CLOSE = "✖️ Close"
 
 MSG_WELCOME = (
     "━━━━━━━━━━━━━━━━━━\n"
-    "⚡ **Knox** · File to Link\n"
+    "🔗 **File To Link**\n"
     "━━━━━━━━━━━━━━━━━━\n\n"
-    "Hey **{user_name}** 👋\n\n"
-    "Send any file and get **instant** stream + download links.\n\n"
-    "┌ **Quick start**\n"
-    "├ 📩 Private → send a file\n"
-    "├ 👥 Group → reply `/link` to a file\n"
-    "└ 📖 `/help` for full guide\n\n"
-    "Ready when you are 🚀"
+    "Hi **{user_name}** 👋\n\n"
+    "Send any file → get **stream** and **download** links.\n\n"
+    "• **Private:** send a file here\n"
+    "• **Group:** reply `/link` on a file\n"
+    "• `/help` for more\n\n"
+    "Send a file to start 🚀"
 )
 
 MSG_HELP = (
     "━━━━━━━━━━━━━━━━━━\n"
-    "📖 **Knox Help**\n"
+    "📖 **Help · File To Link**\n"
     "━━━━━━━━━━━━━━━━━━\n\n"
     "**Private chat**\n"
-    "• Send any media → get links instantly\n\n"
+    "Send any file → links appear instantly.\n\n"
     "**Groups**\n"
-    "• Reply `/link` on a file\n"
-    "• Batch: `/link 5` (max {max_files})\n"
-    "• Knox must be **admin** in the group\n\n"
-    "**Channels**\n"
-    "• Add Knox as admin to auto-link new media\n\n"
+    "Reply `/link` on a file (bot must be admin).\n"
+    "Batch: `/link 5` (up to {max_files} files).\n\n"
     "**Commands**\n"
-    "`/start` · `/help` · `/about` · `/ping` · `/dc`\n"
-    "`/link` · `/link <n>` (groups)\n\n"
-    "💡 Start Knox in DM before using `/link` in groups."
+    "`/start` `/help` `/about` `/ping` `/dc`\n"
+    "`/link` and `/link <n>` in groups.\n\n"
+    "💡 Open the bot in DM before using `/link` in a group."
 )
 
 MSG_ABOUT = (
     "━━━━━━━━━━━━━━━━━━\n"
-    "ℹ️ **About Knox**\n"
+    "ℹ️ **About · File To Link**\n"
     "━━━━━━━━━━━━━━━━━━\n\n"
-    "Knox turns Telegram files into **direct stream & download links**.\n\n"
+    "Turns Telegram files into direct **stream** and **download** links.\n\n"
     "✓ Fast link generation\n"
-    "✓ Online streaming player\n"
-    "✓ All file types supported\n"
-    "✓ Groups, channels & private chat\n"
-    "✓ Batch `/link <n>` in groups\n\n"
-    "Built for speed. Share Knox with friends ⚡"
+    "✓ In-browser streaming\n"
+    "✓ All file types\n"
+    "✓ Private, groups & channels\n"
+    "✓ Batch mode in groups"
 )
 
 # ------ Ping ------
-MSG_PING_START = "🛰️ **Pinging...** Please wait."
+MSG_PING_START = "🛰️ Pinging..."
 MSG_PING_RESPONSE = (
-    "☁️ **PONG! Knox is Online!** ⚡\n\n"
-    "> ⏱️ **Ping:** {time_taken_ms:.2f} ms\n"
-    "> 🤖 **Status:** `Active`"
+    "✅ **Online**\n\n"
+    "> Ping: `{time_taken_ms:.2f}` ms\n"
+    "> Status: `Active`"
 )
 
 # ------ DC Info ------
@@ -228,15 +223,15 @@ MSG_NEW_USER = (
     "> 👤 **Name:** [{first_name}](tg://user?id={user_id})\n"
     "> 🆔 **User ID:** `{user_id}`\n\n"
 )
-MSG_COMMUNITY_CHANNEL = "📢 **{channel_title}:** 🔒 Join this channel to use Knox."
+MSG_COMMUNITY_CHANNEL = "📢 **{channel_title}** — join to use the bot."
 
 # =====================================================================================
 # ====== PROCESSING MESSAGES ======
 # =====================================================================================
 
 # ------ General File Processing ------
-MSG_PROCESSING_REQUEST = "⚡ **Knox** is preparing your links..."
-MSG_PROCESSING_FILE = "⚡ **Knox** is preparing your links..."
+MSG_PROCESSING_REQUEST = "⏳ Generating links..."
+MSG_PROCESSING_FILE = "⏳ Generating links..."
 MSG_NEW_FILE_REQUEST = (
     "> 👤 **Source:** [{source_info}](tg://user?id={id_})\n"
     "> 🆔 **ID:** `{id_}`\n\n"

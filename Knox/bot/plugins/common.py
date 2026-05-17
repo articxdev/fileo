@@ -37,7 +37,7 @@ async def start_command(bot: Client, msg: Message):
         return
     user = msg.from_user
     if user:
-        await log_newusr(bot, user.id, user.first_name)
+        asyncio.create_task(log_newusr(bot, user.id, user.first_name))
     
     if len(msg.command) == 2:
         payload = msg.command[1]

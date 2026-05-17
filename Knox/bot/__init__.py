@@ -4,7 +4,7 @@ from pyrogram import Client
 from Knox.vars import Var
 
 StreamBot = Client(
-    name="Knox",
+    name=Var.NAME,
     api_id=Var.API_ID,
     api_hash=Var.API_HASH,
     bot_token=Var.BOT_TOKEN,

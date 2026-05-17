@@ -46,9 +46,9 @@ class Var:
         logger.critical("Missing required Telegram API configuration")
         raise ValueError("Missing required Telegram API configuration")
 
-    NAME: str = os.getenv("NAME", "Knox")
+    NAME: str = os.getenv("NAME", "File To Link")
     SLEEP_THRESHOLD: int = int(os.getenv("SLEEP_THRESHOLD", "600"))
-    WORKERS: int = int(os.getenv("WORKERS", "8"))
+    WORKERS: int = int(os.getenv("WORKERS", "2"))
 
     BIN_CHANNEL: int = int(os.getenv("BIN_CHANNEL", "0"))
 

@@ -73,10 +73,10 @@ async def force_channel_check(client: Client, message: Message):
             )
         else:
             try:
-                await message.reply_text("You must join the channel to use Knox.")
+                await message.reply_text("You must join the channel to use this bot.")
             except FloodWait as e:
                 await asyncio.sleep(e.value)
-                await message.reply_text("You must join the channel to use Knox.")
+                await message.reply_text("You must join the channel to use this bot.")
         return False
     except Exception as e:
         logger.error(f"Error checking force channel: {e}", exc_info=True)
