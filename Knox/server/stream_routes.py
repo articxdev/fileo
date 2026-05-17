@@ -1,4 +1,4 @@
-﻿# Knox/server/stream_routes.py
+# Knox/server/stream_routes.py
 
 import re
 import secrets
@@ -19,7 +19,7 @@ from Knox.vars import Var
 routes = web.RouteTableDef()
 
 SECURE_HASH_LENGTH = 6
-CHUNK_SIZE = 1024 * 1024
+CHUNK_SIZE = 512 * 1024  # 512 KB — faster first-byte on Render free tier
 MAX_CONCURRENT_PER_CLIENT = 8
 RANGE_REGEX = re.compile(r"bytes=(?P<start>\d*)-(?P<end>\d*)")
 PATTERN_HASH_FIRST = re.compile(
@@ -235,12 +235,13 @@ async def media_delivery(request: web.Request):
                 raise FileNotFound(
                     "File size is reported as zero or unavailable.")
 
-            range_header = request.headers.get("Range", "")
+            range_header = request.headers.get("Range", "").strip()
+            # Track whether the client actually sent a Range header.
+            # This MUST be preserved — even a Range: bytes=0- (full file) must
+            # return 206 + Content-Range so download managers know resume works.
+            has_range = bool(range_header)
             start, end = parse_range_header(range_header, file_size)
             content_length = end - start + 1
-
-            if start == 0 and end == file_size - 1:
-                range_header = ""
 
             mime_type = (
                 file_info.get('mime_type') or 'application/octet-stream')
@@ -258,26 +259,31 @@ async def media_delivery(request: web.Request):
                 "Content-Type": mime_type,
                 "Content-Length": str(content_length),
                 "Content-Disposition": (
-                    f"{disposition}; filename*=UTF-8''{quote(filename)}"),
+                    f"{disposition}; filename*=UTF-8''{quote(filename)};"
+                    f" filename=\"{filename}\""),
+                # CRITICAL: Accept-Ranges must always be present so DMs know
+                # they can send byte-range requests for resume / multi-thread.
                 "Accept-Ranges": "bytes",
-                "Cache-Control": "public, max-age=31536000",
+                "Cache-Control": "public, max-age=604800",
                 "Connection": "keep-alive",
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "Range, Content-Type, *",
                 "Access-Control-Expose-Headers": (
-                    "Content-Length, Content-Range, Content-Disposition"),
+                    "Content-Length, Content-Range, Content-Disposition, "
+                    "Accept-Ranges"),
                 "X-Content-Type-Options": "nosniff"
             }
 
-            if range_header:
+            # Always add Content-Range when client sent a Range header.
+            # Returning 206 WITHOUT Content-Range is invalid per RFC 7233.
+            if has_range:
                 headers["Content-Range"] = f"bytes {start}-{end}/{file_size}"
+
+            status = 206 if has_range else 200
 
             if request.method == 'HEAD':
                 work_loads[client_id] -= 1
-                return web.Response(
-                    status=206 if range_header else 200,
-                    headers=headers
-                )
+                return web.Response(status=status, headers=headers)
 
             async def stream_generator():
                 try:
@@ -307,7 +313,7 @@ async def media_delivery(request: web.Request):
                     work_loads[client_id] -= 1
 
             return web.Response(
-                status=206 if range_header else 200,
+                status=status,
                 body=stream_generator(),
                 headers=headers
             )
