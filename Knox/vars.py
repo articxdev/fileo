@@ -1,4 +1,4 @@
-﻿# Knox/vars.py
+# Knox/vars.py
 
 import os
 
@@ -46,7 +46,7 @@ class Var:
         logger.critical("Missing required Telegram API configuration")
         raise ValueError("Missing required Telegram API configuration")
 
-    NAME: str = os.getenv("NAME", "File To Link")
+    NAME: str = os.getenv("NAME", "FileToLink").replace(" ", "_").replace("-", "_")
     SLEEP_THRESHOLD: int = int(os.getenv("SLEEP_THRESHOLD", "600"))
     WORKERS: int = int(os.getenv("WORKERS", "2"))
 

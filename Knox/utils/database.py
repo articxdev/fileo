@@ -1,4 +1,4 @@
-﻿# Knox/utils/database.py
+# Knox/utils/database.py
 
 import datetime
 from typing import Optional, Dict, Any
@@ -9,8 +9,23 @@ from Knox.utils.logger import logger
 
 class Database:
     def __init__(self, uri: str, database_name: str, *args, **kwargs):
-        self._client = AsyncMongoClient(uri, *args, **kwargs)
-        self.db = self._client[database_name]
+        # Sanitize database name: MongoDB disallows spaces and certain chars
+        safe_name = database_name.replace(" ", "_").replace("-", "_")
+        self._client = AsyncMongoClient(
+            uri,
+            # Render free has 1 CPU; small pool avoids thread contention
+            maxPoolSize=5,
+            minPoolSize=1,
+            # Faster failure on bad URI / network hiccup (ms)
+            serverSelectionTimeoutMS=5000,
+            connectTimeoutMS=5000,
+            socketTimeoutMS=10000,
+            # Keep connections alive across Render's idle periods
+            heartbeatFrequencyMS=10000,
+            *args,
+            **kwargs,
+        )
+        self.db = self._client[safe_name]
         self.col: AsyncCollection = self.db.users
         self.banned_users_col: AsyncCollection = self.db.banned_users
         self.banned_channels_col: AsyncCollection = self.db.banned_channels
