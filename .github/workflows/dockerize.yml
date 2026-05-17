@@ -1,4 +1,4 @@
-name: Docker Build & Push
+﻿name: Docker Build & Push
 
 on:
   push:
@@ -23,4 +23,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: fyaz05/thunder:latest
+          tags: fyaz05/Knox:latest

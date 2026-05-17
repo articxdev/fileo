@@ -1,7 +1,7 @@
-from os import path as opath, getenv, rename
+﻿from os import path as opath, getenv, rename
 from subprocess import run as srun
 from dotenv import load_dotenv
-from Thunder.utils.logger import logger
+from Knox.utils.logger import logger
 
 load_dotenv('config.env', override=True)
 
@@ -20,8 +20,8 @@ if UPSTREAM_REPO:
         
         git_commands = (
             f"git init -q && "
-            f"git config --global user.email thunder@update.local && "
-            f"git config --global user.name Thunder && "
+            f"git config --global user.email Knox@update.local && "
+            f"git config --global user.name Knox && "
             f"git add . && "
             f"git commit -sm update -q && "
             f"git remote add origin {UPSTREAM_REPO} && "

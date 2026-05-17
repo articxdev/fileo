@@ -1,17 +1,17 @@
-<p align="center">
-  <img src="https://cdn.jsdelivr.net/gh/fyaz05/Resources@main/FileToLink/Thunder.jpg" alt="Thunder Logo" width="120">
-  <h1 align="center">⚡ Thunder</h1>
+﻿<p align="center">
+  <img src="https://cdn.jsdelivr.net/gh/fyaz05/Resources@main/FileToLink/Knox.jpg" alt="Knox Logo" width="120">
+  <h1 align="center">⚡ Knox</h1>
 </p>
 
 <p align="center">
-  <b>High-Performance Telegram File-to-Link Bot for Direct Links & Streaming</b>
+  <b>Knox — High-Performance Telegram File-to-Link for Direct Links & Streaming</b>
 </p>
 
 <p align="center">
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.13%2B-blue?style=for-the-badge&logo=python" alt="Python Version"></a>
   <a href="https://github.com/Mayuri-Chan/pyrofork"><img src="https://img.shields.io/badge/Pyrofork-red?style=for-the-badge" alt="Pyrofork"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/fyaz05/FileToLink?style=for-the-badge&color=green" alt="License"></a>
-  <a href="https://t.me/Thunder_Updates"><img src="https://img.shields.io/badge/Telegram-Channel-blue?style=for-the-badge&logo=telegram" alt="Telegram Channel"></a>
+  <a href="https://t.me/Knox_Updates"><img src="https://img.shields.io/badge/Telegram-Channel-blue?style=for-the-badge&logo=telegram" alt="Telegram Channel"></a>
 </p>
 
 <hr>
@@ -50,7 +50,7 @@
 
 ## About The Project
 
-**Thunder** is a powerful Telegram bot that transforms Telegram files into high-speed direct links, perfect for both streaming and rapid downloading. Share files via HTTP(S) links without needing to download them from the Telegram client first.
+**Knox** is a powerful Telegram bot that transforms Telegram files into high-speed direct links, perfect for both streaming and rapid downloading. Share files via HTTP(S) links without needing to download them from the Telegram client first.
 
 ### 💡 Perfect For
 
@@ -63,11 +63,11 @@
 ## How It Works
 
 ```
-User Uploads File → Telegram Bot → Forwards to Channel → Generates Direct Link → Direct Download / Streaming
+User Uploads File → Knox → Forwards to Channel → Generates Direct Link → Direct Download / Streaming
 ```
 
-1. **Upload** → User sends any file to the bot.
-2. **Store** → The bot forwards the file to your private storage channel (`BIN_CHANNEL`), where it is permanently saved to generate the link.
+1. **Upload** → User sends any file to Knox.
+2. **Store** → Knox forwards the file to your private storage channel (`BIN_CHANNEL`), where it is permanently saved to generate the link.
 3. **Generate** → A unique, permanent link is created.
 4. **Stream/Download** → Anyone with the link can stream or download the file directly in their browser.
 5. **Balance** → Multi-client support distributes the load for high availability.
@@ -92,14 +92,14 @@ User Uploads File → Telegram Bot → Forwards to Channel → Generates Direct 
 
 - 🔐 **Token Authentication** - Secure user access with a time-limited token system.
 - 🛡️ **Admin Controls** - Full suite of commands for user and bot management.
-- 👤 **User Authentication** - Require users to join a specific channel before they can use the bot.
+- 👤 **User Authentication** - Require users to join a specific channel before they can use Knox.
 - ✅ **Channel/Group Support** - Fully functional in private chats, groups, and channels.
 
 #### Customization
 
 - 🌍 **Custom Domain** - Serve files from your own domain for a professional look.
 - 🔗 **URL Shortening** - Integrate with URL shortener services for clean, shareable links.
-- 🎨 **Custom Templates** - Personalize messages sent by the bot to match your brand.
+- 🎨 **Custom Templates** - Personalize messages sent by Knox to match your brand.
 - 📈 **Media Info Display** - Shows file size, duration, and format details in the response message.
 
 ## Configuration
@@ -116,7 +116,7 @@ Copy `config_sample.env` to `config.env` and fill in your values.
 | `BIN_CHANNEL` | Storage channel ID | `-1001234567890` |
 | `OWNER_ID` | Owner user ID | `12345678` |
 | `DATABASE_URL` | MongoDB connection | `mongodb+srv://...` |
-| `FQDN` | Domain/IP address | `f2l.thunder.com` |
+| `FQDN` | Domain/IP address | `f2l.knox.com` |
 | `HAS_SSL` | HTTPS enabled | `True` or `False` |
 | `PORT` | Server port | `8080` |
 | `NO_PORT` | Hide port in URLs | `True` or `False` |
@@ -135,7 +135,7 @@ Copy `config_sample.env` to `config.env` and fill in your values.
 | `BANNED_CHANNELS` | Blocked channel IDs | *(empty)* |
 | `SLEEP_THRESHOLD` | Client switch threshold | `300` |
 | `WORKERS` | Async workers | `8` |
-| `NAME` | Bot name | `ThunderF2L` |
+| `NAME` | Bot name | `Knox` |
 | `BIND_ADDRESS` | Bind address | `0.0.0.0` |
 | `PING_INTERVAL` | Ping interval (seconds) | `840` |
 | `TOKEN_ENABLED` | Enable tokens | `False` |
@@ -158,7 +158,7 @@ Copy `config_sample.env` to `config.env` and fill in your values.
 
 ### Basic Usage
 
-1. **Start** → Send `/start` to the bot.
+1. **Start** → Send `/start` to Knox.
 2. **Authenticate** → Join required channels (if configured).
 3. **Upload** → Send any media file.
 4. **Receive** → Get a direct streaming and download link.
@@ -170,11 +170,11 @@ Copy `config_sample.env` to `config.env` and fill in your values.
 
 | Command | Description |
 | :--- | :--- |
-| `/start` | Start the bot and get a welcome message. Also used for token activation. |
+| `/start` | Start Knox and get a welcome message. Also used for token activation. |
 | `/link` | Generates a link. For batches, **reply to the first file** of a group and specify the count. **Example:** `/link 5` will process that file and the next four. |
 | `/dc` | Get the data center (DC) of a user or file. Use `/dc id`, or reply to a file or user. |
-| `/ping` | Check if the bot is online and measure response time. |
-| `/about` | Get information about the bot. |
+| `/ping` | Check if Knox is online and measure response time. |
+| `/about` | Get information about Knox. |
 | `/help` | Show help and usage instructions. |
 
 #### Admin Commands
@@ -187,11 +187,11 @@ Copy `config_sample.env` to `config.env` and fill in your values.
 | `/ban` | Ban a user or channel (reply to message or use user/channel ID). |
 | `/unban` | Unban a user or channel. |
 | `/log` | Send bot logs. |
-| `/restart` | Restart the bot. |
+| `/restart` | Restart Knox. |
 | `/shell` | Execute a shell command. |
 | `/speedtest` | Run network speed test and display comprehensive results. |
 | `/users` | Show total number of users. |
-| `/authorize` | Permanently authorize a user to use the bot (bypasses token system). |
+| `/authorize` | Permanently authorize a user to use Knox (bypasses token system). |
 | `/deauthorize` | Remove permanent authorization from a user. |
 | `/listauth` | List all permanently authorized users. |
 
@@ -215,7 +215,7 @@ authorize - [Admin] Grant access
 deauthorize - [Admin] Revoke access
 listauth - [Admin] List authorized
 log - [Admin] Send bot logs
-restart - [Admin] Restart the bot
+restart - [Admin] Restart Knox
 shell - [Admin] Execute shell command
 speedtest - [Admin] Run network speed test
 ```
@@ -246,7 +246,7 @@ URL_SHORTENER_SITE=shortener.example.com
 
 ### Rate Limiting System
 
-Thunder implements a sophisticated multi-tier rate limiting system designed for high-performance file sharing:
+Knox implements a sophisticated multi-tier rate limiting system designed for high-performance file sharing:
 
 #### **Priority Queue Architecture**
 
@@ -278,7 +278,7 @@ Features include download/upload speeds, latency measurements, and shareable res
 
 ## Deployment Guide
 
-This section covers the complete setup process for deploying Thunder, from prerequisites to production deployment.
+This section covers the complete setup process for deploying Knox, from prerequisites to production deployment.
 
 ### Prerequisites
 
@@ -305,8 +305,8 @@ cp config_sample.env config.env
 nano config.env  # Edit your settings
 
 # 3. Build and run
-docker build -t thunder .
-docker run -d --name thunder -p 8080:8080 thunder
+docker build -t Knox .
+docker run -d --name Knox -p 8080:8080 Knox
 ```
 
 <details>
@@ -329,10 +329,10 @@ cp config_sample.env config.env
 nano config.env
 
 # 5. Run bot
-python -m Thunder
+python -m Knox
 ```
 
-> **Tip:** Start with the essential configuration to get Thunder running, then add optional features as needed.
+> **Tip:** Start with the essential configuration to get Knox running, then add optional features as needed.
 
 </details>
 
@@ -340,21 +340,21 @@ python -m Thunder
 
 ### Deploy to Koyeb
 
-[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=docker&image=docker.io/fyaz05/thunder:latest&name=thunder&ports=8080;http;/&env[API_ID]=&env[API_HASH]=&env[BOT_TOKEN]=&env[BIN_CHANNEL]=&env[OWNER_ID]=&env[DATABASE_URL]=&env[FQDN]=)
+[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=docker&image=docker.io/fyaz05/Knox:latest&name=Knox&ports=8080;http;/&env[API_ID]=&env[API_HASH]=&env[BOT_TOKEN]=&env[BIN_CHANNEL]=&env[OWNER_ID]=&env[DATABASE_URL]=&env[FQDN]=)
 
 After deployment, to add any additional environment variables, use the Koyeb dashboard under **Settings** → **Environment Variables**.
 
 ### Deploy to Render
 
 1. Open [Render Dashboard](https://dashboard.render.com) → **New** → **Web Service**
-2. Choose **Existing Image**: `fyaz05/thunder:latest`
+2. Choose **Existing Image**: `fyaz05/Knox:latest`
 3. Add your environment variables
 4. Click **Deploy**
 
 ### Deploy to Railway
 
 1. Open [Railway](https://railway.app) → **New Project** → **Deploy Service**
-2. Choose **Docker Image**: `fyaz05/thunder:latest`
+2. Choose **Docker Image**: `fyaz05/Knox:latest`
 3. Add your environment variables
 4. Click **Deploy**
 
@@ -365,15 +365,15 @@ After deployment, to add any additional environment variables, use the Koyeb das
 <details>
 <summary>Reverse Proxy Guide</summary>
 
-This guide will help you set up a secure reverse proxy using **NGINX** for your file streaming bot with **Cloudflare SSL protection**.
+This guide will help you set up a secure reverse proxy using **NGINX** for **Knox** with **Cloudflare SSL protection**.
 
 ---
 
 #### ✅ What You Need
 
 - A **VPS or server** running Ubuntu/Debian with NGINX installed.
-- Your **file streaming bot** running on a local port (e.g., `8080`).
-- A **subdomain** (e.g., `f2l.thunder.com`) set up in **Cloudflare**.
+- **Knox** running on a local port (e.g., `8080`).
+- A **subdomain** (e.g., `f2l.knox.com`) set up in **Cloudflare**.
 - **Cloudflare Origin Certificate** files: `cert.pem` and `key.key`.
 
 ---
@@ -390,27 +390,27 @@ This guide will help you set up a secure reverse proxy using **NGINX** for your 
 Create a folder for your certificates and place `cert.pem` and `key.key` inside. Secure the private key.
 
 ```bash
-sudo mkdir -p /etc/ssl/cloudflare/f2l.thunder.com
+sudo mkdir -p /etc/ssl/cloudflare/f2l.knox.com
 # Move/copy your cert.pem and key.key files into this directory
-sudo chmod 600 /etc/ssl/cloudflare/f2l.thunder.com/key.key
-sudo chmod 644 /etc/ssl/cloudflare/f2l.thunder.com/cert.pem
+sudo chmod 600 /etc/ssl/cloudflare/f2l.knox.com/key.key
+sudo chmod 644 /etc/ssl/cloudflare/f2l.knox.com/cert.pem
 ```
 
 ---
 
 #### 🛠️ Step 3: Create NGINX Configuration
 
-Create a new file at `/etc/nginx/sites-available/f2l.thunder.conf` and paste the following, replacing `f2l.thunder.com` and `8080` with your values.
+Create a new file at `/etc/nginx/sites-available/f2l.knox.conf` and paste the following, replacing `f2l.knox.com` and `8080` with your values.
 
 ```nginx
 server {
     listen 443 ssl;
     listen [::]:443 ssl;
-    server_name f2l.thunder.com;
+    server_name f2l.knox.com;
 
     # SSL Configuration
-    ssl_certificate     /etc/ssl/cloudflare/f2l.thunder.com/cert.pem;
-    ssl_certificate_key /etc/ssl/cloudflare/f2l.thunder.com/key.key;
+    ssl_certificate     /etc/ssl/cloudflare/f2l.knox.com/cert.pem;
+    ssl_certificate_key /etc/ssl/cloudflare/f2l.knox.com/key.key;
 
     # Basic security
     add_header X-Frame-Options DENY;
@@ -435,7 +435,7 @@ server {
 server {
     listen 80;
     listen [::]:80;
-    server_name f2l.thunder.com;
+    server_name f2l.knox.com;
     return 301 https://$host$request_uri;
 }
 ```
@@ -447,7 +447,7 @@ server {
 Enable the configuration, test it, and reload NGINX.
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/f2l.thunder.conf /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/f2l.knox.conf /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 ```
@@ -462,17 +462,17 @@ Your reverse proxy is now securely streaming files behind Cloudflare!
 
 #### **Initial Setup**
 
-**Q: Why isn't my bot responding after setup?**
+**Q: Why isn't Knox responding after setup?**
 A: This is usually a configuration issue. Please check the following:
 
 1. **Verify `config.env`**: Make sure all essential variables (`API_ID`, `API_HASH`, `BOT_TOKEN`, `BIN_CHANNEL`, `DATABASE_URL`) are filled in correctly.
-2. **Use `config.env` Only**: Do not edit `vars.py` or `config_sample.env`. The bot is designed to only read your settings from `config.env`.
+2. **Use `config.env` Only**: Do not edit `vars.py` or `config_sample.env`. Knox only reads your settings from `config.env`.
 3. **Check Logs**: Review the console logs on your server or hosting platform (Koyeb, Render, Heroku) for any startup errors.
 
 **Q: What do I use for the `FQDN` variable?**
-A: It's the public URL or IP address of your bot.
+A: It's the public URL or IP address of Knox.
 
-- **With a Domain**: Use your subdomain (e.g., `f2l.thunder.com`).
+- **With a Domain**: Use your subdomain (e.g., `f2l.knox.com`).
 - **On Koyeb/Render/Heroku**: Use the public URL provided by the platform.
 - **On a VPS**: Use your server's public IP address.
 
@@ -482,19 +482,19 @@ A: For links to work on a VPS, the URL must include the port number (e.g., `http
 #### **Common Errors**
 
 **Q: Why are my links showing a "Resource Not Found" error or not working?**
-A: This error means the bot can't access the file. Check these three things:
+A: This error means Knox can't access the file. Check these three things:
 
 1. **Invalid Token**: Your `BOT_TOKEN` or one of the `MULTI_TOKEN`s might be wrong. Double-check them with @BotFather.
-2. **Missing Admin Rights**: The bot and **all** your client accounts must be **administrators** in the `BIN_CHANNEL`.
+2. **Missing Admin Rights**: Knox and **all** your client accounts must be **administrators** in the `BIN_CHANNEL`.
 3. **File Deleted**: The link will break if the file was deleted from your `BIN_CHANNEL`.
 
 **Q: Why isn't video or audio playing correctly in my browser?**
-A: Your browser likely doesn't support the file's audio or video format (codec). This is a browser limitation, not a bot issue.
+A: Your browser likely doesn't support the file's audio or video format (codec). This is a browser limitation, not a Knox issue.
 
 - **Solution**: For perfect playback, copy the link and play it in a dedicated media player. Recommended players include **VLC Media Player**, **MX Player**, **PotPlayer**, **IINA**, and **MPV**.
 
-**Q: Why does the bot sometimes become unresponsive?**
-A: This is likely a **Telegram Flood Wait**. To prevent spam, Telegram temporarily limits accounts that make too many requests. The bot is designed to handle this automatically by pausing and will resume on its own once the limit is lifted.
+**Q: Why does Knox sometimes become unresponsive?**
+A: This is likely a **Telegram Flood Wait**. To prevent spam, Telegram temporarily limits accounts that make too many requests. Knox handles this automatically by pausing and will resume on its own once the limit is lifted.
 
 #### **Performance**
 
