@@ -158,6 +158,28 @@
             fill: currentColor;
         }
 
+        .info-badges {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .badge svg { width: 14px; height: 14px; fill: currentColor; }
+        .badge-green  { background: rgba(34,197,94,0.15);  color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+        .badge-blue   { background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); }
+        .badge-purple { background: rgba(167,139,250,0.15);color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
+
         /* External Players Drawer */
         .drawer-overlay {
             position: fixed;
@@ -310,6 +332,22 @@
             .action-bar { flex-direction: column; width: 100%; max-width: 320px; }
             .btn { width: 100%; justify-content: center; }
         }
+
+        .dm-info {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            background: rgba(56,189,248,0.07);
+            border: 1px solid rgba(56,189,248,0.2);
+            border-radius: 12px;
+            padding: 14px 16px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-top: 8px;
+        }
+        .dm-info svg { width: 20px; height: 20px; fill: #38bdf8; flex-shrink: 0; margin-top: 2px; }
+        .dm-info strong { color: var(--text-main); }
     </style>
 </head>
 <body>
@@ -336,7 +374,7 @@
         </div>
 
         <div class="action-bar">
-            <a href="{{ src }}" download="{{ file_name }}" class="btn primary">
+            <a href="{{ src }}" download="{{ file_name }}" class="btn primary" id="downloadBtn">
                 <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
                 Download File
             </a>
@@ -350,6 +388,26 @@
                 <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM9.5 7.5v9l7-4.5-7-4.5z"/></svg>
                 Open in App
             </button>
+
+            <button class="btn" id="dlManagerBtn">
+                <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+                High Speed
+            </button>
+        </div>
+
+        <div class="info-badges">
+            <span class="badge badge-green">
+                <svg viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
+                Resumable Download
+            </span>
+            <span class="badge badge-blue">
+                <svg viewBox="0 0 24 24"><path d="M13 2.05v2.02c3.95.49 7 3.85 7 7.93 0 3.21-1.81 6-4.72 7.72L13 17v5h5l-1.22-1.22C19.91 19.07 22 15.76 22 12c0-5.18-3.95-9.45-9-9.95zM11 2.05C5.95 2.55 2 6.82 2 12c0 3.76 2.09 7.07 5.22 8.78L6 22h5V2.05z"/></svg>
+                Multi-thread Ready
+            </span>
+            <span class="badge badge-purple">
+                <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                Secure TLS Link
+            </span>
         </div>
     </main>
 
@@ -363,7 +421,30 @@
         </div>
         
         <div class="drawer-content">
-            <div class="player-category">Android</div>
+            <!-- Download Managers -->
+            <div class="player-category">⚡ High Speed Download Managers</div>
+            <div class="player-grid">
+                <a href="{{ src }}" class="player-card" id="aria2Link" title="Copy link for aria2">
+                    <svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    aria2 / IDM
+                </a>
+                <a href="{{ src }}" class="player-card" id="curlLink" title="Copy curl command">
+                    <svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm4-4h8v2h-8z"/></svg>
+                    curl / wget
+                </a>
+                <a href="{{ src }}" class="player-card" id="motrixLink">
+                    <svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+                    Motrix
+                </a>
+            </div>
+
+            <div class="dm-info">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                <span>This link supports <strong>HTTP Range Requests</strong> (byte-range) — compatible with <strong>IDM, aria2, JDownloader, curl -C -, wget -c</strong>, and all major download managers. Downloads are fully <strong>resumable and multi-threaded</strong>.</span>
+            </div>
+
+            <!-- External Players -->
+            <div class="player-category" style="margin-top:24px">Android Players</div>
             <div class="player-grid">
                 <a href="intent:{{ src }}#Intent;action=android.intent.action.VIEW;type=video/*;package=org.videolan.vlc;end" class="player-card">VLC</a>
                 <a href="intent:{{ src }}#Intent;action=android.intent.action.VIEW;type=video/*;package=com.mxtech.videoplayer.ad;S.title={{ file_name }};end" class="player-card">MX Player</a>
@@ -372,7 +453,7 @@
                 <a href="intent:{{ src }}#Intent;action=android.intent.action.VIEW;type=video/*;package=com.brouken.player;end" class="player-card">Just Player</a>
             </div>
 
-            <div class="player-category">iOS / macOS</div>
+            <div class="player-category" style="margin-top:16px">iOS / macOS</div>
             <div class="player-grid">
                 <a href="vlc-x-callback://x-callback-url/stream?url={{ src }}" class="player-card">VLC</a>
                 <a href="infuse://x-callback-url/play?url={{ src }}" class="player-card">Infuse</a>
@@ -380,7 +461,7 @@
                 <a href="iina://weblink?url={{ src }}" class="player-card">IINA (Mac)</a>
             </div>
 
-            <div class="player-category">Windows</div>
+            <div class="player-category" style="margin-top:16px">Windows / Linux</div>
             <div class="player-grid">
                 <a href="vlc://{{ src }}" class="player-card">VLC</a>
                 <a href="potplayer://{{ src }}" class="player-card">PotPlayer</a>
@@ -431,6 +512,45 @@
         openBtn.addEventListener('click', openDrawer);
         closeBtn.addEventListener('click', closeDrawer);
         overlay.addEventListener('click', closeDrawer);
+
+        // High Speed button also opens drawer
+        document.getElementById('dlManagerBtn').addEventListener('click', openDrawer);
+
+        // Helper: show toast
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        const fileUrl = new URL('{{ src }}', window.location.href).href;
+        const fileName = '{{ file_name }}';
+
+        // aria2 / IDM card — copy raw URL (for use in IDM/aria2)
+        document.getElementById('aria2Link').addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await navigator.clipboard.writeText(fileUrl);
+                showToast('Link copied! Paste into IDM / aria2');
+            } catch { window.open(fileUrl); }
+        });
+
+        // curl card — copy curl resume command
+        document.getElementById('curlLink').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const cmd = `curl -C - -L -o "${fileName}" "${fileUrl}"`;
+            try {
+                await navigator.clipboard.writeText(cmd);
+                showToast('curl command copied!');
+            } catch { window.open(fileUrl); }
+        });
+
+        // Motrix — open with motrix:// protocol
+        document.getElementById('motrixLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'motrix://download?url=' + encodeURIComponent(fileUrl);
+        });
     </script>
 </body>
 </html>

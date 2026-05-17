@@ -3,6 +3,7 @@ cloudscraper
 Jinja2
 pyrofork
 pymongo
+certifi
 psutil
 python-dotenv
 speedtest-cli

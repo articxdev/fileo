@@ -1,6 +1,7 @@
 # Knox/utils/database.py
 
 import datetime
+import certifi
 from typing import Optional, Dict, Any
 from pymongo import AsyncMongoClient
 from pymongo.asynchronous.collection import AsyncCollection
@@ -13,15 +14,19 @@ class Database:
         safe_name = database_name.replace(" ", "_").replace("-", "_")
         self._client = AsyncMongoClient(
             uri,
+            # Fix: Python 3.13 strict TLS requires explicit CA bundle (certifi)
+            # without this Atlas returns TLSV1_ALERT_INTERNAL_ERROR
+            tlsCAFile=certifi.where(),
             # Render free has 1 CPU; small pool avoids thread contention
             maxPoolSize=5,
             minPoolSize=1,
-            # Faster failure on bad URI / network hiccup (ms)
-            serverSelectionTimeoutMS=5000,
-            connectTimeoutMS=5000,
-            socketTimeoutMS=10000,
+            # Give Atlas enough time to respond on Render cold starts
+            serverSelectionTimeoutMS=30000,
+            connectTimeoutMS=20000,
+            socketTimeoutMS=20000,
             # Keep connections alive across Render's idle periods
             heartbeatFrequencyMS=10000,
+            retryWrites=True,
             *args,
             **kwargs,
         )
