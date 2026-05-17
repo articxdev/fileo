@@ -123,7 +123,7 @@ async def broadcast_message(client: Client, message: Message, mode: str = "all")
                     reason = "deactivated account"
                 elif isinstance(e, UserIsBlocked):
                     recipient_type = "User"
-                    reason = "blocked Knox"
+                    reason = "blocked the bot"
                 elif isinstance(e, UserDeactivated):
                     recipient_type = "User"
                     reason = "deactivated account"
