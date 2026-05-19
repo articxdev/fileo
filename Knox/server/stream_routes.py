@@ -19,7 +19,7 @@ from Knox.vars import Var
 routes = web.RouteTableDef()
 
 SECURE_HASH_LENGTH = 6
-CHUNK_SIZE = 512 * 1024  # 512 KB — faster first-byte on Render free tier
+CHUNK_SIZE = 1024 * 1024  # 1 MB — Telegram API strictly uses 1MB chunks
 MAX_CONCURRENT_PER_CLIENT = 8
 RANGE_REGEX = re.compile(r"bytes=(?P<start>\d*)-(?P<end>\d*)")
 PATTERN_HASH_FIRST = re.compile(
