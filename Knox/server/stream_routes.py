@@ -84,11 +84,13 @@ def select_optimal_client() -> tuple[int, ByteStreamer]:
         (cid, load) for cid, load in work_loads.items()
         if load < MAX_CONCURRENT_PER_CLIENT]
 
-    if available_clients:
-        client_id = min(available_clients, key=lambda x: x[1])[0]
-    else:
-        client_id = min(work_loads, key=work_loads.get)
+    if not available_clients:
+        raise web.HTTPTooManyRequests(
+            text="Concurrent connection limit reached. Download managers will back off automatically.",
+            headers={"Retry-After": "2"}
+        )
 
+    client_id = min(available_clients, key=lambda x: x[1])[0]
     return client_id, get_streamer(client_id)
 
 
