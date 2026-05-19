@@ -14,9 +14,7 @@ class Database:
         safe_name = database_name.replace(" ", "_").replace("-", "_")
         self._client = AsyncMongoClient(
             uri,
-            # Fix: Force TLS and bypass cert validation if OpenSSL fails
-            tls=True,
-            tlsAllowInvalidCertificates=True,
+            # Fix: Provide valid CA bundle for Python 3.12+ OpenSSL to verify Atlas certs
             tlsCAFile=certifi.where(),
             # Render free has 1 CPU; small pool avoids thread contention
             maxPoolSize=10,
